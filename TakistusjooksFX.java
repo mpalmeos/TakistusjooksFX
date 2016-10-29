@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -14,26 +15,27 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Maie on 22/10/2016.
  */
-/**public class TakistusjooksFX extends Application {
+public class TakistusjooksFX extends Application {
 
+    private HashMap<KeyCode, Boolean> keys = new HashMap<KeyCode, Boolean>();
     private ArrayList<Node> platforms = new ArrayList<Node>();
 
     private Pane appRoot = new Pane();
     private Pane gameRoot = new Pane();
-    private Pane uiRoot = new Pane();
 
     private Node player;
-    private Point2D playerVelocity = new Point2D(0, 0);
     private boolean canJump = true;
+    private boolean running = true;
 
     private int levelWidth;
 
     private void initContent() {
-        Rectangle taust = new Rectangle(800, 600);
+        Rectangle taust = new Rectangle(600, 400);
 
         levelWidth = LevelData.LVL1[0].length() * 60;
 
@@ -51,21 +53,33 @@ import java.util.ArrayList;
             }
         }
 
-        player = createEntity(60, 180, 40, 40, Color.BLUE);
+        player = createEntity(60, 140, 40, 40, Color.BLUE);
 
-        appRoot.getChildren().addAll(taust, gameRoot, uiRoot);
+        appRoot.getChildren().addAll(taust, gameRoot);
+    }
+
+    private boolean isPressed(KeyCode key) {
+
+        return keys.getOrDefault(key, false);
+    }
+
+    private void update() {
+        if(isPressed(KeyCode.SPACE) && player.getTranslateY() >= 5){
+            jumpPlayer();
+        }
+
+        if(isPressed(KeyCode.W) && player.getTranslateY() >=5) {
+            jumpPlayer();
+        }
+
+        if(isPressed(KeyCode.UP) && player.getTranslateY() >=5) {
+            jumpPlayer();
+        }
     }
 
     private void jumpPlayer() {
         if (canJump) {
-            playerVelocity = playerVelocity.add(0, -30);
             canJump = false;
-        }
-    }
-
-    private void update() {
-        if (playerVelocity.getY() < 10) {
-            playerVelocity = playerVelocity.add(0, 1);
         }
     }
 
@@ -86,6 +100,8 @@ import java.util.ArrayList;
         initContent();
 
         Scene scene = new Scene(appRoot);
+        scene.setOnKeyPressed(event -> keys.put(event.getCode(), true));
+        scene.setOnKeyReleased(event -> keys.put(event.getCode(), false));
         primaryStage.setTitle("TakistusjooksFX");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -93,12 +109,19 @@ import java.util.ArrayList;
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                update();
+                player.setTranslateY(player.getTranslateY()+2);
+                if (running) {
+                    update();
+                }
+
+                running = true;
             }
+
         };
         timer.start();
     }
         public static void main(String[] args) {
-        launch(args);
+
+            launch(args);
     }
-}*/
+}

@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 /**
  * Created by Maie on 22/10/2016.
  */
-public class FXGame extends Application {
+/**public class FXGame extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -54,4 +54,4 @@ public class FXGame extends Application {
         });
 
     }
-}
+}*/
