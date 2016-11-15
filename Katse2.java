@@ -19,8 +19,6 @@ import java.util.HashMap;
 public class Katse2 extends Application {
 
     private ArrayList platvormid = new ArrayList();     // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
-    private HashMap klaviatuur = new HashMap();         // HashMap, mille abil saab hiljem lugeda, missugust nuppu vajutati
-    private Rectangle mangija;                          // Mängija kuubik
 
     private Pane appRoot = new Pane();                  // appRoot'is toimub kogu liikumine
     private Pane gameRoot = new Pane();                 //gameRootis' on kõik mängu elemendid (mängija+level)
@@ -29,9 +27,9 @@ public class Katse2 extends Application {
 
     private boolean hypeVoimalik;
 
-    public double grav;
-    public double mangijaY;
-    public Rectangle taust = new Rectangle(600, 400);
+    public double grav;                                 //Gravitatsioon ehk mängija kukub alla.
+    public double mangijaY;                             //Mängija Y koordinaat ehk üles-alla liikumine
+    public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
 
     private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (mis kõik on ruudud)
         Rectangle ruut = new Rectangle(w, h);
@@ -61,9 +59,17 @@ public class Katse2 extends Application {
                 }
             }
         }
-        Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);  //Tekita mängija (ruut) ja säti ta teatud koordinaatidele)
+        //Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);  //Tekita mängija (ruut) ja säti ta teatud koordinaatidele)
 
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
+    }
+
+    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);
+
+    private void takistus(){
+        for (Rectangle platvorm : platvormid) {
+
+        }
     }
 
     @Override
@@ -78,7 +84,11 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                
+                mangijaY = mangija.getY();
+                grav = grav +0.3;
+                mangija.setY(mangijaY + grav);
+                takistus();
+
             }
 
         };timer.start();
@@ -87,9 +97,9 @@ public class Katse2 extends Application {
             esimene.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.SPACE){
                     System.out.println("KLIKK");
-                    grav = -10;
+                    grav = -5;
                 } else if (event.getCode() == KeyCode.UP){
-                    grav = -10;
+                    grav = -5;
                 }
             });
         }
