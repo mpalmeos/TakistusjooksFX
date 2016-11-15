@@ -29,7 +29,9 @@ public class Katse2 extends Application {
 
     private boolean hypeVoimalik;
 
-    private double grav;
+    public double grav;
+    public double mangijaY;
+    public Rectangle taust = new Rectangle(600, 400);
 
     private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (mis kõik on ruudud)
         Rectangle ruut = new Rectangle(w, h);
@@ -42,7 +44,7 @@ public class Katse2 extends Application {
     };
 
     private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData).
-        Rectangle taust = new Rectangle(400, 400); //Uus taust (hetkel must ristkülik)
+        //Rectangle taust = new Rectangle(600, 400); //Uus taust (hetkel must ristkülik)
 
         manguLaius = LevelData.LVL1[0].length()*50; //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse ja korruta 50-ga
                                                     //(50 on ühe individuaalse ruudu suurus ehk 50x50)
@@ -64,31 +66,6 @@ public class Katse2 extends Application {
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
-    private boolean kasVajutatud(KeyCode key) { //See meetod peaks takistama topelthüpet.
-
-        return (boolean) klaviatuur.getOrDefault(key, false);
-    }
-
-    private void uuenda() {                     //Hüppamist lubav meetod
-
-        if (kasVajutatud(KeyCode.SPACE)) {      //Vastava nupu vajutamisel aktiveerub hüpe.
-            hype();
-        }
-        if (kasVajutatud(KeyCode.W)) {
-            hype();
-        }
-        if (kasVajutatud(KeyCode.UP)){
-            hype();
-        }
-    }
-
-    private void hype() {                       //Hüppamist lubav meetod
-        if (hypeVoimalik) {                     //Kui hypeVoimalik == true, siis vähenda gravitatsiooni.
-            grav = - 10;
-            hypeVoimalik = false;               //Seejärel ütleme ise, et hypeVoimalik == false ehk hype ei tohi enam toimuda.
-        }
-    }
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         manguSisu();                            //Genereeri mängu sisu ehk lae level.
@@ -101,9 +78,20 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                    uuenda();
+                
             }
+
         };timer.start();
 
+        {
+            esimene.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.SPACE){
+                    System.out.println("KLIKK");
+                    grav = -10;
+                } else if (event.getCode() == KeyCode.UP){
+                    grav = -10;
+                }
+            });
+        }
     }
 }
