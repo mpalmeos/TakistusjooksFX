@@ -12,13 +12,14 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 /**
  * Created by Maie on 29/10/2016.
  */
 public class Katse2 extends Application {
 
-    private ArrayList platvormid = new ArrayList();     // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
+    private ArrayList <Rectangle> platvormid = new ArrayList();     // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
 
     private Pane appRoot = new Pane();                  // appRoot'is toimub kogu liikumine
     private Pane gameRoot = new Pane();                 //gameRootis' on kõik mängu elemendid (mängija+level)
@@ -42,33 +43,39 @@ public class Katse2 extends Application {
     };
 
     private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData).
-        //Rectangle taust = new Rectangle(600, 400); //Uus taust (hetkel must ristkülik)
 
-        manguLaius = LevelData.LVL1[0].length()*50; //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse ja korruta 50-ga
-                                                    //(50 on ühe individuaalse ruudu suurus ehk 50x50)
-        for (int i = 0; i < LevelData.LVL1.length; i++) { //Käi läbi iga veerg
-            String rida = LevelData.LVL1[i];              //Salvesta iga veeru andmed
-            for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga rida
-                switch (rida.charAt(j)) {                 //Vastavalt real olevale märgile:
-                    case '0':                             //Kui on "0", siis ära tee midagi (jääb tühjaks)
+        manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
+
+        for (int i = 0; i < LevelData.LVL1.length; i++) { //Käi läbi iga rida
+            String rida = LevelData.LVL1[i];
+            for (int j = 0; j < rida.length(); j++) {
+                switch (rida.charAt(j)) {
+                    case '0':
                         break;
-                    case'1':                              //Kui on "1", siis tekita sinine ruut (platvorm)
-                        Rectangle platvorm = tekitaRuut(j*50, i*50, 50, 50, Color.BLUE);
+                    case '1':
+                        Rectangle platvorm = tekitaRuut(j * 50, i * 50, 50, 50, Color.BLUE);
                         platvormid.add(platvorm);         //Lisa tekkinud platvorm ArrayListi platvormid, kusjuures selle
-                        break;                            //asukohaks märgi vastavad i ja j koordinaadid
+                        break;
                 }
             }
         }
-        //Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);  //Tekita mängija (ruut) ja säti ta teatud koordinaatidele)
-
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
     Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);
 
-    private void takistus(){
-        for (Rectangle platvorm : platvormid) {
+    private void takistus() {
 
+        for (Rectangle platvorm : platvormid) {
+            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
+                if (mangija.getTranslateX() == platvorm.getTranslateX()) {
+                    return;
+                }
+                if (mangija.getTranslateY() == platvorm.getTranslateY()){
+                    mangija.setTranslateY(mangija.getTranslateY() + 1);
+                    return;
+                }
+            }
         }
     }
 
@@ -87,7 +94,6 @@ public class Katse2 extends Application {
                 mangijaY = mangija.getY();
                 grav = grav +0.3;
                 mangija.setY(mangijaY + grav);
-                takistus();
 
             }
 
