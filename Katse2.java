@@ -28,8 +28,10 @@ public class Katse2 extends Application {
 
     private boolean hypeVoimalik;                       //topelthüpe?
 
-    public double grav;                                 //Gravitatsioon ehk mängija kukub alla.
+    public double grav;//Gravitatsioon ehk mängija kukub alla.
     public double mangijaY;                             //Mängija Y koordinaat ehk üles-alla liikumine
+    public double mangijaX;
+    public double paremale;
     public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
 
     private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik on ruudud)
@@ -64,6 +66,7 @@ public class Katse2 extends Application {
 
     Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
+
     private void liigubAlla() {                             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
         for (Rectangle platvorm : platvormid) {             //Käi läbi kõik platvormid ArrayListis "platvormid".
             if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija ruut läheb vastu platvorme ...
@@ -72,6 +75,15 @@ public class Katse2 extends Application {
                 }
             }
         }
+
+    private void liigubParemale(){
+        for (Rectangle platvorm : platvormid) {
+            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
+                paremale = 0;
+                return;
+            }
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -89,8 +101,10 @@ public class Katse2 extends Application {
                 grav = grav +0.3;
                 mangija.setY(mangijaY + grav);
                 liigubAlla();
-                double mangijaX = mangija.getX();
-                mangija.setX(mangijaX + 3);
+                mangijaX = mangija.getX();
+                paremale = 3;
+                mangija.setX(mangijaX + paremale);
+                liigubParemale();
             }
 
         };timer.start();
