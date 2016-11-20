@@ -26,13 +26,13 @@ public class Katse2 extends Application {
 
     private int manguLaius;                             //Teeb kindlaks ühe leveli laiuse
 
-    private boolean hypeVoimalik;
+    private boolean hypeVoimalik;                       //topelthüpe?
 
     public double grav;                                 //Gravitatsioon ehk mängija kukub alla.
     public double mangijaY;                             //Mängija Y koordinaat ehk üles-alla liikumine
     public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
 
-    private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (mis kõik on ruudud)
+    private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik on ruudud)
         Rectangle ruut = new Rectangle(w, h);
         ruut.setTranslateX(x);                              //Seab paika koordinaadid tekkinud ruudule
         ruut.setTranslateY(y);
@@ -47,14 +47,14 @@ public class Katse2 extends Application {
         manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
 
         for (int i = 0; i < LevelData.LVL1.length; i++) { //Käi läbi iga rida
-            String rida = LevelData.LVL1[i];
-            for (int j = 0; j < rida.length(); j++) {
+            String rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
+            for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga loodud string
                 switch (rida.charAt(j)) {
-                    case '0':
+                    case '0':                             //Kui on "0", siis ära tee midagi.
                         break;
-                    case '1':
+                    case '1':                             //Kui on "1", siis tekita ruut meetodi tekitaRuut abil
                         Rectangle platvorm = tekitaRuut(j * 50, i * 50, 50, 50, Color.BLUE);
-                        platvormid.add(platvorm);         //Lisa tekkinud platvorm ArrayListi platvormid, kusjuures selle
+                        platvormid.add(platvorm);         //Lisa tekkinud platvorm ArrayListi platvormid
                         break;
                 }
             }
@@ -62,28 +62,22 @@ public class Katse2 extends Application {
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
-    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);
+    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
-    private void takistus() {
-
-        for (Rectangle platvorm : platvormid) {
-            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                if (mangija.getTranslateX() == platvorm.getTranslateX()) {
-                    return;
-                }
-                if (mangija.getTranslateY() == platvorm.getTranslateY()){
-                    mangija.setTranslateY(mangija.getTranslateY() + 1);
+    private void liigubAlla() {                             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
+        for (Rectangle platvorm : platvormid) {             //Käi läbi kõik platvormid ArrayListis "platvormid".
+            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija ruut läheb vastu platvorme ...
+                grav = -0.55;                                //... vähenda gravitatsiooni ehk liigu vähem alla.
                     return;
                 }
             }
         }
-    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         manguSisu();                            //Genereeri mängu sisu ehk lae level.
 
-        Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine
+        Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine (esimene stseen - tulevikus teised ka?)
         primaryStage.setTitle("Takistusjooks");
         primaryStage.setScene(esimene);
         primaryStage.show();
@@ -91,21 +85,22 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                mangijaY = mangija.getY();
+                mangijaY = mangija.getY();          //Gravitatsiooni tekitamine
                 grav = grav +0.3;
                 mangija.setY(mangijaY + grav);
-
+                liigubAlla();
+                double mangijaX = mangija.getX();
+                mangija.setX(mangijaX + 3);
             }
 
         };timer.start();
 
         {
-            esimene.setOnKeyPressed(event -> {
+            esimene.setOnKeyPressed(event -> {          //Hüppamine
                 if (event.getCode() == KeyCode.SPACE){
-                    System.out.println("KLIKK");
-                    grav = -5;
+                    grav = -7;
                 } else if (event.getCode() == KeyCode.UP){
-                    grav = -5;
+                    grav = -7;
                 }
             });
         }
