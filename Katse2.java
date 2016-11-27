@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import static org.omg.IOP.TAG_ORB_TYPE.value;
+
 /**
  * Created by Maie on 29/10/2016.
  */
@@ -26,12 +28,8 @@ public class Katse2 extends Application {
 
     private int manguLaius;                             //Teeb kindlaks ühe leveli laiuse
 
-    private boolean hypeVoimalik;                       //topelthüpe?
+    private boolean kasSaab;                       //topelthüpe?
 
-    public double grav;//Gravitatsioon ehk mängija kukub alla.
-    public double mangijaY;                             //Mängija Y koordinaat ehk üles-alla liikumine
-    public double mangijaX;
-    public double paremale;
     public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
 
     private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik on ruudud)
@@ -66,22 +64,45 @@ public class Katse2 extends Application {
 
     Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
+    private void mangijaHyppab() {
+        if (kasSaab) {
+            mangija.setTranslateY(mangija.getTranslateY() + 40);
+            kasSaab = false;
+        }
+    }
 
-    private void liigubAlla() {                             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
-        for (Rectangle platvorm : platvormid) {             //Käi läbi kõik platvormid ArrayListis "platvormid".
-            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija ruut läheb vastu platvorme ...
-                grav = -0.55;                                //... vähenda gravitatsiooni ehk liigu vähem alla.
-                    return;
+    private void liigubAlla(int value) {                             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
+        boolean allapoole = value > 0;
+
+        for (int i = 0; i < Math.abs(value); i++) {
+            for (Rectangle platvorm : platvormid) {             //Käi läbi kõik platvormid ArrayListis "platvormid".
+                if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija ruut läheb vastu platvorme ...
+                    if (allapoole) {
+                        if (mangija.getTranslateY() + 30 == platvorm.getTranslateY()) {
+                            mangija.setTranslateY(mangija.getTranslateY() - 1);
+                            kasSaab = true;
+                            return;
+                        }
+                    }
+                    else {
+                        if (mangija.getTranslateY() == platvorm.getTranslateY() + 30) {
+                            return;
+                        }
+                    }
                 }
             }
+            mangija.setTranslateY(mangija.getTranslateY() + (allapoole ? 1 : -1));
         }
+    }
 
     private void liigubParemale(){
         for (Rectangle platvorm : platvormid) {
             if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                paremale = 0;
-                return;
+                if (mangija.getTranslateX() + 40 == platvorm.getTranslateX()) {
+                    return;
+                }
             }
+            mangija.setTranslateX(mangija.getTranslateX() - 5);
         }
     }
 
@@ -97,24 +118,19 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                mangijaY = mangija.getY();          //Gravitatsiooni tekitamine
-                grav = grav +0.3;
-                mangija.setY(mangijaY + grav);
-                liigubAlla();
-                mangijaX = mangija.getX();
-                paremale = 3;
-                mangija.setX(mangijaX + paremale);
-                liigubParemale();
+                liigubAlla(5);
+                mangijaHyppab();
+                //liigubParemale();
             }
 
         };timer.start();
 
         {
             esimene.setOnKeyPressed(event -> {          //Hüppamine
-                if (event.getCode() == KeyCode.SPACE){
-                    grav = -7;
-                } else if (event.getCode() == KeyCode.UP){
-                    grav = -7;
+                if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5){
+                    mangijaHyppab();
+                } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5){
+                    mangijaHyppab();
                 }
             });
         }
