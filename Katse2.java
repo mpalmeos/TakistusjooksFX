@@ -28,6 +28,7 @@ public class Katse2 extends Application {
 
     private int manguLaius;                             //Teeb kindlaks ühe leveli laiuse
 
+    private int grav;
     private boolean kasSaab;                       //topelthüpe?
 
     public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
@@ -66,7 +67,8 @@ public class Katse2 extends Application {
 
     private void mangijaHyppab() {
         if (kasSaab) {
-            mangija.setTranslateY(mangija.getTranslateY() + 40);
+            System.out.println("HYPE");
+            mangija.setTranslateY(mangija.getTranslateY() - 100);
             kasSaab = false;
         }
     }
@@ -75,8 +77,8 @@ public class Katse2 extends Application {
         boolean allapoole = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
-            for (Rectangle platvorm : platvormid) {             //Käi läbi kõik platvormid ArrayListis "platvormid".
-                if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija ruut läheb vastu platvorme ...
+            for (Rectangle platvorm : platvormid) {
+                if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
                     if (allapoole) {
                         if (mangija.getTranslateY() + 30 == platvorm.getTranslateY()) {
                             mangija.setTranslateY(mangija.getTranslateY() - 1);
@@ -85,7 +87,7 @@ public class Katse2 extends Application {
                         }
                     }
                     else {
-                        if (mangija.getTranslateY() == platvorm.getTranslateY() + 30) {
+                        if (mangija.getTranslateY() == platvorm.getTranslateY() + 60) {
                             return;
                         }
                     }
@@ -95,14 +97,18 @@ public class Katse2 extends Application {
         }
     }
 
-    private void liigubParemale(){
+    private void liigubParemale(int value2){
+        boolean paremale = value2 > 0;
+
+        for (int i = 0; i < Math.abs(value2); i++) {
         for (Rectangle platvorm : platvormid) {
             if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                if (mangija.getTranslateX() + 40 == platvorm.getTranslateX()) {
+                if (mangija.getTranslateX() + 30 == platvorm.getTranslateX()) {
                     return;
                 }
             }
-            mangija.setTranslateX(mangija.getTranslateX() - 5);
+        }
+            mangija.setTranslateX(mangija.getTranslateX() + 5);
         }
     }
 
@@ -119,8 +125,7 @@ public class Katse2 extends Application {
             @Override
             public void handle(long now) {
                 liigubAlla(5);
-                mangijaHyppab();
-                //liigubParemale();
+                liigubParemale(1);
             }
 
         };timer.start();
