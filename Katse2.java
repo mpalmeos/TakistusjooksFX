@@ -60,10 +60,32 @@ public class Katse2 extends Application {
                 }
             }
         }
+    }
+
+
+    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
+
+    {mangija.translateXProperty().addListener((obs, old, newValue) -> {
+            int offset = newValue.intValue();
+
+            if (offset > 1 && offset < manguLaius - 1) {
+                System.out.println("BONG");
+                gameRoot.setLayoutX(-(offset - 1));
+            }
+        });
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
-    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
+    /**Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
+
+    mangija.translateXProperty().addListener((obs, old, newValue) -> {
+        int offset = newValue.intValue();
+
+        if (offset > 640 && offset < manguLaius - 640) {
+            gameRoot.setLayoutX(-(offset - 640));
+        }
+    });*/
+
 
     private void mangijaHyppab() {
         if (kasSaab) {
