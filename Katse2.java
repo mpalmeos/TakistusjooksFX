@@ -1,5 +1,6 @@
 package TakistusjooksFX;
 
+import com.sun.xml.internal.bind.WhiteSpaceProcessor;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -15,16 +16,13 @@ import java.util.ArrayList;
  */
 public class Katse2 extends Application {
 
-    private ArrayList <Rectangle> platvormid = new ArrayList();     // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
-
-    private Pane appRoot = new Pane();                  // appRoot'is toimub kogu liikumine
-    private Pane gameRoot = new Pane();                 //gameRootis' on kõik mängu elemendid (mängija+level)
-
-    private int manguLaius;                             //Teeb kindlaks ühe leveli laiuse
+    public ArrayList <Rectangle> platvormid = new ArrayList();      // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
+    public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
+    public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
+    public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
     public int value = 5;
-    private boolean kasSaab;                       //topelthüpe?
-
-    public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
+    public boolean kasSaab;                                         // topelthüpe?
+    public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
 
     private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik on ruudud)
         Rectangle ruut = new Rectangle(w, h);
@@ -90,7 +88,10 @@ public class Katse2 extends Application {
     public void mangijaHyppab() {
         if (kasSaab) {
             System.out.println("HYPE");
-            mangija.setTranslateY(mangija.getTranslateY() - 150);
+            for (int i = 0; i < 10; i++) {
+                mangija.setTranslateY(mangija.getTranslateY() - 9);
+            }
+            //mangija.setTranslateY(mangija.getTranslateY() - 30);
             kasSaab = false;
             return;
         }
@@ -118,7 +119,6 @@ public class Katse2 extends Application {
 
         Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine (esimene stseen - tulevikus teised ka?)
         primaryStage.setTitle("Takistusjooks");
-
         primaryStage.setScene(esimene);
         primaryStage.show();
 
@@ -126,8 +126,8 @@ public class Katse2 extends Application {
             @Override
             public void handle(long now) {
                 liigubAlla();
-                liigubParemale(1);
-                taustLiigub();
+                //liigubParemale(1);
+                //taustLiigub();
             }
 
         };timer.start();
