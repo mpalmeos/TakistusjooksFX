@@ -8,7 +8,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 
 /**
@@ -57,7 +56,7 @@ public class Katse2 extends Application {
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
-    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.RED);    //Tekita mängija ruut
+    Rectangle mangija = tekitaRuut(100, 100, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
     private void taustLiigub() {
         double scrollSpeed = - 5;
@@ -91,8 +90,7 @@ public class Katse2 extends Application {
     public void mangijaHyppab() {
         if (kasSaab) {
             System.out.println("HYPE");
-            value = -2;
-            //mangija.setTranslateY(mangija.getTranslateY() - 150);
+            mangija.setTranslateY(mangija.getTranslateY() - 150);
             kasSaab = false;
             return;
         }
@@ -129,7 +127,7 @@ public class Katse2 extends Application {
             public void handle(long now) {
                 liigubAlla();
                 liigubParemale(1);
-                //taustLiigub();
+                taustLiigub();
             }
 
         };timer.start();
