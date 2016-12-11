@@ -2,7 +2,6 @@ package TakistusjooksFX;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -11,10 +10,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.Level;
-
-import static org.omg.IOP.TAG_ORB_TYPE.value;
 
 /**
  * Created by Maie on 29/10/2016.
@@ -27,8 +22,7 @@ public class Katse2 extends Application {
     private Pane gameRoot = new Pane();                 //gameRootis' on kõik mängu elemendid (mängija+level)
 
     private int manguLaius;                             //Teeb kindlaks ühe leveli laiuse
-
-    private int grav;
+    public int value = 5;
     private boolean kasSaab;                       //topelthüpe?
 
     public Rectangle taust = new Rectangle(600, 400);   //Taust ehk must ruut
@@ -60,44 +54,19 @@ public class Katse2 extends Application {
                 }
             }
         }
-    }
-
-
-    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
-
-    {mangija.translateXProperty().addListener((obs, old, newValue) -> {
-            int offset = newValue.intValue();
-
-            if (offset > 1 && offset < manguLaius - 1) {
-                System.out.println("BONG");
-                gameRoot.setLayoutX(-(offset - 1));
-            }
-        });
         appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
     }
 
-    /**Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.WHITE);    //Tekita mängija ruut
+    Rectangle mangija = tekitaRuut(30, 30, 30, 30, Color.RED);    //Tekita mängija ruut
 
-    mangija.translateXProperty().addListener((obs, old, newValue) -> {
-        int offset = newValue.intValue();
-
-        if (offset > 640 && offset < manguLaius - 640) {
-            gameRoot.setLayoutX(-(offset - 640));
-        }
-    });*/
-
-
-    private void mangijaHyppab() {
-        if (kasSaab) {
-            System.out.println("HYPE");
-            mangija.setTranslateY(mangija.getTranslateY() - 100);
-            kasSaab = false;
-        }
+    private void taustLiigub() {
+        double scrollSpeed = - 5;
+        double taustParemale = gameRoot.getLayoutX() + scrollSpeed;
+        gameRoot.setLayoutX(taustParemale);
     }
 
-    private void liigubAlla(int value) {                             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
+    public void liigubAlla() {             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
         boolean allapoole = value > 0;
-
         for (int i = 0; i < Math.abs(value); i++) {
             for (Rectangle platvorm : platvormid) {
                 if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
@@ -119,6 +88,16 @@ public class Katse2 extends Application {
         }
     }
 
+    public void mangijaHyppab() {
+        if (kasSaab) {
+            System.out.println("HYPE");
+            value = -2;
+            //mangija.setTranslateY(mangija.getTranslateY() - 150);
+            kasSaab = false;
+            return;
+        }
+    }
+
     private void liigubParemale(int value2){
         boolean paremale = value2 > 0;
 
@@ -134,20 +113,23 @@ public class Katse2 extends Application {
         }
     }
 
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         manguSisu();                            //Genereeri mängu sisu ehk lae level.
 
         Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine (esimene stseen - tulevikus teised ka?)
         primaryStage.setTitle("Takistusjooks");
+
         primaryStage.setScene(esimene);
         primaryStage.show();
 
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                liigubAlla(5);
+                liigubAlla();
                 liigubParemale(1);
+                //taustLiigub();
             }
 
         };timer.start();
