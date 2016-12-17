@@ -20,11 +20,11 @@ public class Katse2 extends Application {
     public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
-    public int value = 5;
-    public boolean kasSaab;                                         // topelthüpe?
+    public double grav = 0.1;                                       // Gravitatsioonikonstant
+
     public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
 
-    private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik on ruudud)
+    private Rectangle tekitaRuut(int x, int y, int w, int h, Color color) {      //Programmisisene meetod elementide loomiseks (kõik ruudud)
         Rectangle ruut = new Rectangle(w, h);
         ruut.setTranslateX(x);                              //Seab paika koordinaadid tekkinud ruudule
         ruut.setTranslateY(y);
@@ -51,64 +51,33 @@ public class Katse2 extends Application {
                 }
             }
         }
-        appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine
+        appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine (appRoot)
     }
 
     Rectangle mangija = tekitaRuut(100, 100, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
-    private void taustLiigub() {
-        double scrollSpeed = - 5;
-        double taustParemale = gameRoot.getLayoutX() + scrollSpeed;
-        gameRoot.setLayoutX(taustParemale);
+    private void taustLiigub() {               //Meetod, mis paneb tausta vasakult paremale liikuma (liigub gameRoot)
+        double scrollSpeed = - 2;              //Liikumise kiirus
+        double taustParemale = gameRoot.getLayoutX() + scrollSpeed;  //Võta gameRoot X asukoha ja lisa juurde liikumine
+        gameRoot.setLayoutX(taustParemale);    //Sea uueks gameRoot X-telje asukohaks tekkinud arv
     }
 
-    public void liigubAlla() {             //Gravity detection meetod ehk et mängija istub teiste ruutude peal
-        boolean allapoole = value > 0;
-        for (int i = 0; i < Math.abs(value); i++) {
+    public void gravity() {             //Mängija kukub pidevalt allapoole
+        double mangijaY = mangija.getTranslateY();  //Leia mängija asukoht Y-teljel
+        grav = grav + 0.1;                  //Gravity ehk mida kõrgemalt kukub, seda kõrgem väärtus
+        double uusMangijaY = mangijaY + grav;  //Leia mängija asukoht Y-teljel koos gravitatsiooniga
+        mangija.setTranslateY(uusMangijaY);     //Sea mängija uueks Y-koordinaadiks leitud asukoht
+    }
+
+    public void hitDetection() {
+
+        for (int i = 0; i <60; i++) {
             for (Rectangle platvorm : platvormid) {
                 if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                    if (allapoole) {
-                        if (mangija.getTranslateY() + 30 == platvorm.getTranslateY()) {
-                            mangija.setTranslateY(mangija.getTranslateY() - 1);
-                            kasSaab = true;
-                            return;
-                        }
-                    }
-                    else {
-                        if (mangija.getTranslateY() == platvorm.getTranslateY() + 60) {
-                            return;
-                        }
-                    }
+                    mangija.setTranslateY(mangija.getTranslateY() - 1);
                 }
             }
-            mangija.setTranslateY(mangija.getTranslateY() + (allapoole ? 1 : -1));
-        }
-    }
-
-    public void mangijaHyppab() {
-        if (kasSaab) {
-            System.out.println("HYPE");
-            for (int i = 0; i < 10; i++) {
-                mangija.setTranslateY(mangija.getTranslateY() - 9);
-            }
-            //mangija.setTranslateY(mangija.getTranslateY() - 30);
-            kasSaab = false;
-            return;
-        }
-    }
-
-    private void liigubParemale(int value2){
-        boolean paremale = value2 > 0;
-
-        for (int i = 0; i < Math.abs(value2); i++) {
-        for (Rectangle platvorm : platvormid) {
-            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                if (mangija.getTranslateX() + 30 == platvorm.getTranslateX()) {
-                    return;
-                }
-            }
-        }
-            mangija.setTranslateX(mangija.getTranslateX() + 5);
+            //mangija.setTranslateX(mangija.getTranslateX() + 2);
         }
     }
 
@@ -125,9 +94,9 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                liigubAlla();
-                //liigubParemale(1);
+                gravity();
                 //taustLiigub();
+                hitDetection();
             }
 
         };timer.start();
@@ -135,9 +104,9 @@ public class Katse2 extends Application {
         {
             esimene.setOnKeyPressed(event -> {          //Hüppamine
                 if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5){
-                    mangijaHyppab();
+                    grav = -4;
                 } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5){
-                    mangijaHyppab();
+                    grav = -4;
                 }
             });
         }
