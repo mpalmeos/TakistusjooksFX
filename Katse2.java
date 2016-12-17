@@ -1,6 +1,5 @@
 package TakistusjooksFX;
 
-import com.sun.xml.internal.bind.WhiteSpaceProcessor;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,11 +15,12 @@ import java.util.ArrayList;
  */
 public class Katse2 extends Application {
 
-    public ArrayList <Rectangle> platvormid = new ArrayList();      // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
+    public ArrayList<Rectangle> platvormid = new ArrayList();      // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
     public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
     public double grav = 0.1;                                       // Gravitatsioonikonstant
+    public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
 
     public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
 
@@ -32,7 +32,9 @@ public class Katse2 extends Application {
 
         gameRoot.getChildren().addAll(ruut);                //Tekkinud ruudud pannakse gameRoot'i ehk Pane'i, kus on kõik elemendid
         return ruut;
-    };
+    }
+
+    ;
 
     private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData).
 
@@ -51,36 +53,67 @@ public class Katse2 extends Application {
                 }
             }
         }
-        appRoot.getChildren().addAll(taust,gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine (appRoot)
+        appRoot.getChildren().addAll(taust, gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine (appRoot)
     }
 
     Rectangle mangija = tekitaRuut(100, 100, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
     private void taustLiigub() {               //Meetod, mis paneb tausta vasakult paremale liikuma (liigub gameRoot)
-        double scrollSpeed = - 2;              //Liikumise kiirus
+        double scrollSpeed = -2;              //Liikumise kiirus
         double taustParemale = gameRoot.getLayoutX() + scrollSpeed;  //Võta gameRoot X asukoha ja lisa juurde liikumine
         gameRoot.setLayoutX(taustParemale);    //Sea uueks gameRoot X-telje asukohaks tekkinud arv
     }
 
-    public void gravity() {             //Mängija kukub pidevalt allapoole
+    public void gravity(boolean isHitting) {             //Mängija kukub pidevalt allapoole
+        if (isHitting && grav == 0) {
+            return;
+        }
         double mangijaY = mangija.getTranslateY();  //Leia mängija asukoht Y-teljel
         grav = grav + 0.1;                  //Gravity ehk mida kõrgemalt kukub, seda kõrgem väärtus
         double uusMangijaY = mangijaY + grav;  //Leia mängija asukoht Y-teljel koos gravitatsiooniga
         mangija.setTranslateY(uusMangijaY);     //Sea mängija uueks Y-koordinaadiks leitud asukoht
     }
 
-    public void hitDetection() {
-
-        for (int i = 0; i <60; i++) {
-            for (Rectangle platvorm : platvormid) {
-                if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) {
-                    mangija.setTranslateY(mangija.getTranslateY() - 1);
-                }
-            }
-            //mangija.setTranslateX(mangija.getTranslateX() + 2);
+    public void playerMove(boolean isHitting) {         //Mängija liigutamine
+        if (!isHitting) {                               //Kui kokkupõrget pole, siis liiguta mängijat edasi
+            mangija.setTranslateX(mangija.getTranslateX() + 2);
         }
     }
 
+    public boolean verticalHitDetection() {             //Kukub platvormile ja jääb püsima
+        for (Rectangle platvorm : platvormid) {         //Käi läbi kõik platvormid
+            if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija asukoht ristub platvormiga...
+                if (grav != -4 && grav != 0) {          //Kui gravitatsioon ei ole -4 (ehk ei toimu hüpet) ja see ei ole 0 (ehk mängija ei seisa platvormil,
+                    grav = 0;                           //siis lülita gravitatsioon välja ja
+                    jumping = false;                    //(Hüpe false ehk topelthüpet ei saa teha)
+                    mangija.setTranslateY(platvorm.getTranslateY() - mangija.getHeight()); //sea mängija asukohaks platvorm + mängija kõrgus ehk platvormi kohale
+                }
+                return true;                            //Ülalnimetatud tegevuste tulemuseks määra meetodi tõeseks ehk kokkupõrge toimus
+            }
+        }
+        return false;                                   //Kui kokkupõrget ei toimunud, siis määra meetod mittetõeseks
+    }
+
+    public boolean horizontalHitDetection() {           //Läheb vastu platvormi ja ei sõida sisse
+        for (Rectangle platvorm : platvormid) {         //Käi läbi kõik platvormid
+            if (mangija.getTranslateX() + mangija.getWidth() > platvorm.getTranslateX()  //Kui mängija ei asu platvormi piires ehk mängija vasak külg + laius on suuremad
+                    && mangija.getTranslateX() + mangija.getWidth() < platvorm.getTranslateX() + platvorm.getWidth()) { //platvormi vasakust ja paremast küljest
+                System.out.println("hit a platform " + platvorm.getTranslateX() + " " + platvorm.getTranslateY());
+                System.out.println("" + mangija.getTranslateY() + " " + (platvorm.getTranslateY() - mangija.getHeight()));
+                if (mangija.getTranslateY() > platvorm.getTranslateY() - mangija.getHeight()) { //Kui samal ajal mängija Y-koordinaat on suurem platvormi Y-koordinaadist - mängija kõrgus
+                    System.out.println("ouch");                                                 //ehk mängija on platvormi kohal,
+                    return true;                                                            //siis määra meetodi tõeseks ehk kokkupõrge toimus (mööda X-telge)
+                }
+            }
+        }
+        return false;           //Vastasel juhul on meetod mittetõene ehk kokkupõrget ei toimunud.
+    }
+
+    public void gameEND() {
+        if (mangija.getTranslateX() > appRoot.getTranslateX() - 400) {
+            System.out.println("EKRAAN" + appRoot.getTranslateX());
+    }
+}
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -94,19 +127,24 @@ public class Katse2 extends Application {
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
-                gravity();
-                //taustLiigub();
-                hitDetection();
+                boolean isHorizontalHitting = horizontalHitDetection();
+                playerMove(isHorizontalHitting);
+                boolean isHitting = verticalHitDetection();
+                gravity(isHitting);
+                taustLiigub();
+                gameEND();
             }
 
         };timer.start();
 
         {
             esimene.setOnKeyPressed(event -> {          //Hüppamine
-                if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5){
+                if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5 && !jumping){
                     grav = -4;
-                } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5){
+                    jumping = true;
+                } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5 && !jumping){
                     grav = -4;
+                    jumping = true;
                 }
             });
         }
