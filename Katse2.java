@@ -15,11 +15,11 @@ import java.util.ArrayList;
  */
 public class Katse2 extends Application {
 
-    public ArrayList<Rectangle> platvormid = new ArrayList();      // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
+    public ArrayList<Rectangle> platvormid = new ArrayList();       // ArrayList, mis hoiab kõik mängulaua elemendid, v.a mängija
     public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
-    public double grav = 0.1;                                       // Gravitatsioonikonstant
+    public double grav = 1;                                          // Gravitatsioonikonstant
     public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
 
     public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
@@ -28,18 +28,15 @@ public class Katse2 extends Application {
         Rectangle ruut = new Rectangle(w, h);
         ruut.setTranslateX(x);                              //Seab paika koordinaadid tekkinud ruudule
         ruut.setTranslateY(y);
-        ruut.setFill(color);
+        ruut.setFill(color);                                //Annab ruudule värvi
 
         gameRoot.getChildren().addAll(ruut);                //Tekkinud ruudud pannakse gameRoot'i ehk Pane'i, kus on kõik elemendid
         return ruut;
     }
 
-    ;
-
-    private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData).
-
+    private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData) (Almas Baimagambetov:
+                                        // https://github.com/AlmasB/FXTutorials/blob/master/src/com/almasb/tutorial14/Main.java)
         manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
-
         for (int i = 0; i < LevelData.LVL1.length; i++) { //Käi läbi iga rida
             String rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
             for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga loodud string
@@ -59,12 +56,12 @@ public class Katse2 extends Application {
     Rectangle mangija = tekitaRuut(100, 100, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
     private void taustLiigub() {               //Meetod, mis paneb tausta vasakult paremale liikuma (liigub gameRoot)
-        double scrollSpeed = -2;              //Liikumise kiirus
+        double scrollSpeed = -3;              //Liikumise kiirus
         double taustParemale = gameRoot.getLayoutX() + scrollSpeed;  //Võta gameRoot X asukoha ja lisa juurde liikumine
         gameRoot.setLayoutX(taustParemale);    //Sea uueks gameRoot X-telje asukohaks tekkinud arv
     }
 
-    public void gravity(boolean isHitting) {             //Mängija kukub pidevalt allapoole
+    public void gravity(boolean isHitting) {             //Mängija kukub pidevalt allapoole (sõbra abi - Jason Parks)
         if (isHitting && grav == 0) {
             return;
         }
@@ -74,13 +71,13 @@ public class Katse2 extends Application {
         mangija.setTranslateY(uusMangijaY);     //Sea mängija uueks Y-koordinaadiks leitud asukoht
     }
 
-    public void playerMove(boolean isHitting) {         //Mängija liigutamine
+    public void playerMove(boolean isHitting) {         //Mängija liigutamine (sõbra abi - Jason Parks)
         if (!isHitting) {                               //Kui kokkupõrget pole, siis liiguta mängijat edasi
-            mangija.setTranslateX(mangija.getTranslateX() + 2);
+            mangija.setTranslateX(mangija.getTranslateX() + 3);
         }
     }
 
-    public boolean verticalHitDetection() {             //Kukub platvormile ja jääb püsima
+    public boolean verticalHitDetection() {             //Kukub platvormile ja jääb püsima (sõbra abi - Jason Parks)
         for (Rectangle platvorm : platvormid) {         //Käi läbi kõik platvormid
             if (mangija.getBoundsInParent().intersects(platvorm.getBoundsInParent())) { //Kui mängija asukoht ristub platvormiga...
                 if (grav != -4 && grav != 0) {          //Kui gravitatsioon ei ole -4 (ehk ei toimu hüpet) ja see ei ole 0 (ehk mängija ei seisa platvormil,
@@ -94,7 +91,7 @@ public class Katse2 extends Application {
         return false;                                   //Kui kokkupõrget ei toimunud, siis määra meetod mittetõeseks
     }
 
-    public boolean horizontalHitDetection() {           //Läheb vastu platvormi ja ei sõida sisse
+    public boolean horizontalHitDetection() {           //Läheb vastu platvormi ja ei sõida sisse (sõbra abi - Jason Parks)
         for (Rectangle platvorm : platvormid) {         //Käi läbi kõik platvormid
             if (mangija.getTranslateX() + mangija.getWidth() > platvorm.getTranslateX()  //Kui mängija ei asu platvormi piires ehk mängija vasak külg + laius on suuremad
                     && mangija.getTranslateX() + mangija.getWidth() < platvorm.getTranslateX() + platvorm.getWidth()) { //platvormi vasakust ja paremast küljest
@@ -111,9 +108,8 @@ public class Katse2 extends Application {
 
     public void gameEND() {
         if (mangija.getTranslateX() > appRoot.getTranslateX() - 400) {
-            System.out.println("EKRAAN" + appRoot.getTranslateX());
+        }
     }
-}
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -138,7 +134,7 @@ public class Katse2 extends Application {
         };timer.start();
 
         {
-            esimene.setOnKeyPressed(event -> {          //Hüppamine
+            esimene.setOnKeyPressed(event -> {          //Hüppamine (sõbra abi - Jason Parks)
                 if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5 && !jumping){
                     grav = -4;
                     jumping = true;
