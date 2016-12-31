@@ -3,8 +3,10 @@ package TakistusjooksFX;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -95,8 +97,8 @@ public class Katse2 extends Application {
         for (Rectangle platvorm : platvormid) {         //Käi läbi kõik platvormid
             if (mangija.getTranslateX() + mangija.getWidth() > platvorm.getTranslateX()  //Kui mängija ei asu platvormi piires ehk mängija vasak külg + laius on suuremad
                     && mangija.getTranslateX() + mangija.getWidth() < platvorm.getTranslateX() + platvorm.getWidth()) { //platvormi vasakust ja paremast küljest
-                System.out.println("hit a platform " + platvorm.getTranslateX() + " " + platvorm.getTranslateY());
-                System.out.println("" + mangija.getTranslateY() + " " + (platvorm.getTranslateY() - mangija.getHeight()));
+                //System.out.println("hit a platform " + platvorm.getTranslateX() + " " + platvorm.getTranslateY());
+                //System.out.println("" + mangija.getTranslateY() + " " + (platvorm.getTranslateY() - mangija.getHeight()));
                 if (mangija.getTranslateY() > platvorm.getTranslateY() - mangija.getHeight()) { //Kui samal ajal mängija Y-koordinaat on suurem platvormi Y-koordinaadist - mängija kõrgus
                     System.out.println("ouch");                                                 //ehk mängija on platvormi kohal,
                     return true;                                                            //siis määra meetodi tõeseks ehk kokkupõrge toimus (mööda X-telge)
@@ -104,11 +106,6 @@ public class Katse2 extends Application {
             }
         }
         return false;           //Vastasel juhul on meetod mittetõene ehk kokkupõrget ei toimunud.
-    }
-
-    public void gameEND() {
-        if (mangija.getTranslateX() > appRoot.getTranslateX() - 400) {
-        }
     }
 
     @Override
@@ -120,6 +117,12 @@ public class Katse2 extends Application {
         primaryStage.setScene(esimene);
         primaryStage.show();
 
+        VBox akenEnd = new VBox();
+        Button uuesti = new Button("Uuesti?");
+        akenEnd.setStyle("-fx-background-color:RED");
+        akenEnd.getChildren().addAll(uuesti);
+        Scene teine = new Scene(akenEnd, 600, 400);
+
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
             public void handle(long now) {
@@ -128,7 +131,9 @@ public class Katse2 extends Application {
                 boolean isHitting = verticalHitDetection();
                 gravity(isHitting);
                 taustLiigub();
-                gameEND();
+                if (mangija.getTranslateY() > appRoot.getTranslateY() + 400) {
+                    primaryStage.setScene(teine);
+                }
             }
 
         };timer.start();
