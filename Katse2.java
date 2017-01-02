@@ -2,14 +2,19 @@ package TakistusjooksFX;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import javax.sound.midi.Soundbank;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +26,7 @@ public class Katse2 extends Application {
     public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
-    public double grav = 1;                                          // Gravitatsioonikonstant
+    public double grav;                                          // Gravitatsioonikonstant
     public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
 
     public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
@@ -112,16 +117,24 @@ public class Katse2 extends Application {
     public void start(Stage primaryStage) throws Exception {
         manguSisu();                            //Genereeri mängu sisu ehk lae level.
 
-        Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine (esimene stseen - tulevikus teised ka?)
+        Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine
         primaryStage.setTitle("Takistusjooks");
         primaryStage.setScene(esimene);
         primaryStage.show();
 
-        VBox akenEnd = new VBox();
+        VBox akenEnd = new VBox();                      //Death screen (Tehtud docs.oracle.com juhendi järgi)
         Button uuesti = new Button("Uuesti?");
+        uuesti.setStyle("-fx-font-size: 21pt;");        //Nupu suurus (teksti suurus)
         akenEnd.setStyle("-fx-background-color:RED");
-        akenEnd.getChildren().addAll(uuesti);
+        akenEnd.getChildren().add(uuesti);
+        akenEnd.setAlignment(Pos.CENTER);               //Seab nupu keskele
         Scene teine = new Scene(akenEnd, 600, 400);
+
+        StackPane congratsAken = new StackPane();       //Lõpusõnum
+        Text congratsT = new Text("Palju õnne!!!");
+        congratsT.setStyle("-fx-font-size: 40pt;");
+        congratsAken.getChildren().add(congratsT);
+        Scene kolmas = new Scene(congratsAken, 600, 400);
 
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
             @Override
@@ -131,8 +144,13 @@ public class Katse2 extends Application {
                 boolean isHitting = verticalHitDetection();
                 gravity(isHitting);
                 taustLiigub();
-                if (mangija.getTranslateY() > appRoot.getTranslateY() + 400) {
+
+                if (mangija.getTranslateY() > appRoot.getTranslateY() + 400) {  //Kui mängija kukub alla, siis näita Death Screen
                     primaryStage.setScene(teine);
+                }
+
+                if (mangija.getTranslateX() > (manguLaius + 1) * 50){           //kui mängija jõuab lõppu + 1 ruut, siis näita lõpusõnumit
+                    primaryStage.setScene(kolmas);
                 }
             }
 
@@ -144,9 +162,15 @@ public class Katse2 extends Application {
                     grav = -4;
                     jumping = true;
                 } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5 && !jumping){
-                    grav = -4;
+                    grav = -3;
                     jumping = true;
                 }
+            });
+            uuesti.setOnAction(event -> {       //Death screen nupp -> reset game
+                mangija.setTranslateX(100);
+                mangija.setTranslateY(100);
+                gameRoot.setLayoutX(0);
+                primaryStage.setScene(esimene);
             });
         }
     }
