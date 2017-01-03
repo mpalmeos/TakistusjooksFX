@@ -26,7 +26,8 @@ public class Katse2 extends Application {
     public Pane appRoot = new Pane();                               // appRoot'is toimub kogu liikumine
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
-    public double grav;                                          // Gravitatsioonikonstant
+    public int maxLaius;
+    public double grav;                                            // Gravitatsioonikonstant
     public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
 
     public Rectangle taust = new Rectangle(600, 400);   // Taust ehk must ruut
@@ -41,10 +42,12 @@ public class Katse2 extends Application {
         return ruut;
     }
 
-    private void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData) (Almas Baimagambetov:
+    public void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData) (Almas Baimagambetov:
                                         // https://github.com/AlmasB/FXTutorials/blob/master/src/com/almasb/tutorial14/Main.java)
         manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
-        for (int i = 0; i < LevelData.LVL1.length; i++) { //Käi läbi iga rida
+        maxLaius = LevelData.LVL1.length;
+
+        for (int i = 0; i < maxLaius; i++) { //Käi läbi iga rida
             String rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
             for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga loodud string
                 switch (rida.charAt(j)) {
@@ -118,7 +121,7 @@ public class Katse2 extends Application {
         manguSisu();                            //Genereeri mängu sisu ehk lae level.
 
         Scene esimene = new Scene(appRoot);     //Akna tegemine ja appRoot näitamine
-        primaryStage.setTitle("Takistusjooks");
+        primaryStage.setTitle("Napikas: The Game");
         primaryStage.setScene(esimene);
         primaryStage.show();
 
@@ -130,10 +133,11 @@ public class Katse2 extends Application {
         akenEnd.setAlignment(Pos.CENTER);               //Seab nupu keskele
         Scene teine = new Scene(akenEnd, 600, 400);
 
-        StackPane congratsAken = new StackPane();       //Lõpusõnum
-        Text congratsT = new Text("Palju õnne!!!");
+        VBox congratsAken = new VBox();                 //Lõpusõnum
+        Text congratsT = new Text("See oli küll napikas!!!");
         congratsT.setStyle("-fx-font-size: 40pt;");
         congratsAken.getChildren().add(congratsT);
+        congratsAken.setAlignment(Pos.CENTER);
         Scene kolmas = new Scene(congratsAken, 600, 400);
 
         AnimationTimer timer = new AnimationTimer() { //Kogu liikumine, mis mängus toimub.
@@ -159,7 +163,7 @@ public class Katse2 extends Application {
         {
             esimene.setOnKeyPressed(event -> {          //Hüppamine (sõbra abi - Jason Parks)
                 if (event.getCode() == KeyCode.SPACE && mangija.getTranslateY() >= 5 && !jumping){
-                    grav = -4;
+                    grav = -3;
                     jumping = true;
                 } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5 && !jumping){
                     grav = -3;
