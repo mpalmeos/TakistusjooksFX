@@ -2,19 +2,17 @@ package TakistusjooksFX;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-import javax.sound.midi.Soundbank;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +25,8 @@ public class Katse2 extends Application {
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
     public int maxLaius;
+    public int nextLevel = 1;
+    public String rida;
     public double grav;                                            // Gravitatsioonikonstant
     public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
 
@@ -44,11 +44,21 @@ public class Katse2 extends Application {
 
     public void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData) (Almas Baimagambetov:
                                         // https://github.com/AlmasB/FXTutorials/blob/master/src/com/almasb/tutorial14/Main.java)
-        manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
-        maxLaius = LevelData.LVL1.length;
+
+        if (nextLevel == 1) {
+            manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
+            maxLaius = LevelData.LVL1.length;
+        } else if (nextLevel == 2){
+            manguLaius = LevelData.LVL2[0].length();
+            maxLaius = LevelData.LVL2.length;
+        }
 
         for (int i = 0; i < maxLaius; i++) { //Käi läbi iga rida
-            String rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
+            if (nextLevel == 1) {
+                rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
+            } else if (nextLevel == 2){
+                rida = LevelData.LVL2[i];
+            }
             for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga loodud string
                 switch (rida.charAt(j)) {
                     case '0':                             //Kui on "0", siis ära tee midagi.
@@ -108,7 +118,7 @@ public class Katse2 extends Application {
                 //System.out.println("hit a platform " + platvorm.getTranslateX() + " " + platvorm.getTranslateY());
                 //System.out.println("" + mangija.getTranslateY() + " " + (platvorm.getTranslateY() - mangija.getHeight()));
                 if (mangija.getTranslateY() > platvorm.getTranslateY() - mangija.getHeight()) { //Kui samal ajal mängija Y-koordinaat on suurem platvormi Y-koordinaadist - mängija kõrgus
-                    System.out.println("ouch");                                                 //ehk mängija on platvormi kohal,
+                    //System.out.println("ouch");                                                 //ehk mängija on platvormi kohal,
                     return true;                                                            //siis määra meetodi tõeseks ehk kokkupõrge toimus (mööda X-telge)
                 }
             }
@@ -136,7 +146,9 @@ public class Katse2 extends Application {
         VBox congratsAken = new VBox();                 //Lõpusõnum
         Text congratsT = new Text("See oli küll napikas!!!");
         congratsT.setStyle("-fx-font-size: 40pt;");
-        congratsAken.getChildren().add(congratsT);
+        Button round = new Button("MORE!");
+        round.setStyle("-fx-font-size: 21pt;");
+        congratsAken.getChildren().addAll(round);
         congratsAken.setAlignment(Pos.CENTER);
         Scene kolmas = new Scene(congratsAken, 600, 400);
 
@@ -170,7 +182,17 @@ public class Katse2 extends Application {
                     jumping = true;
                 }
             });
+
             uuesti.setOnAction(event -> {       //Death screen nupp -> reset game
+                mangija.setTranslateX(100);
+                mangija.setTranslateY(100);
+                gameRoot.setLayoutX(0);
+                primaryStage.setScene(esimene);
+            });
+
+            round.setOnAction(event -> {
+                System.out.println("ROUND");
+                nextLevel = 2;
                 mangija.setTranslateX(100);
                 mangija.setTranslateY(100);
                 gameRoot.setLayoutX(0);
