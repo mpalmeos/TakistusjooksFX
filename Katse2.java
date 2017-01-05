@@ -25,7 +25,6 @@ public class Katse2 extends Application {
     public Pane gameRoot = new Pane();                              // gameRootis' on kõik mängu elemendid (mängija+level)
     public int manguLaius;                                          // Teeb kindlaks ühe leveli laiuse
     public int maxLaius;
-    public int nextLevel = 1;
     public String rida;
     public double grav;                                            // Gravitatsioonikonstant
     public boolean jumping = false;                                 // Topelthüpe keelatud ehk mängija hüppab korra ja järgmine hüpe on lubatud pärast esimese hüppe lõppu
@@ -44,21 +43,11 @@ public class Katse2 extends Application {
 
     public void manguSisu() {          //Meetod, mis genereerib terve leveli ette antud andmetest (LevelData) (Almas Baimagambetov:
                                         // https://github.com/AlmasB/FXTutorials/blob/master/src/com/almasb/tutorial14/Main.java)
-
-        if (nextLevel == 1) {
             manguLaius = LevelData.LVL1[0].length(); //Mängu laiuseks võta LevelData's oleva stringi ühe "sõna" pikkuse
             maxLaius = LevelData.LVL1.length;
-        } else if (nextLevel == 2){
-            manguLaius = LevelData.LVL2[0].length();
-            maxLaius = LevelData.LVL2.length;
-        }
 
         for (int i = 0; i < maxLaius; i++) { //Käi läbi iga rida
-            if (nextLevel == 1) {
                 rida = LevelData.LVL1[i];              //Muuda iga "sõna" sees olev täht eraldi stringiks (muidu asi ei tööta)
-            } else if (nextLevel == 2){
-                rida = LevelData.LVL2[i];
-            }
             for (int j = 0; j < rida.length(); j++) {     //Käi läbi iga loodud string
                 switch (rida.charAt(j)) {
                     case '0':                             //Kui on "0", siis ära tee midagi.
@@ -144,11 +133,11 @@ public class Katse2 extends Application {
         Scene teine = new Scene(akenEnd, 600, 400);
 
         VBox congratsAken = new VBox();                 //Lõpusõnum
+        Button uuesti2 = new Button("Uuesti?");
+        uuesti2.setStyle("-fx-font-size: 21pt;");
         Text congratsT = new Text("See oli küll napikas!!!");
         congratsT.setStyle("-fx-font-size: 40pt;");
-        Button round = new Button("MORE!");
-        round.setStyle("-fx-font-size: 21pt;");
-        congratsAken.getChildren().addAll(round);
+        congratsAken.getChildren().addAll(congratsT, uuesti2);
         congratsAken.setAlignment(Pos.CENTER);
         Scene kolmas = new Scene(congratsAken, 600, 400);
 
@@ -163,11 +152,11 @@ public class Katse2 extends Application {
 
                 if (mangija.getTranslateY() > appRoot.getTranslateY() + 400) {  //Kui mängija kukub alla, siis näita Death Screen
                     primaryStage.setScene(teine);
-                }
+                    }
 
-                if (mangija.getTranslateX() > (manguLaius + 1) * 50){           //kui mängija jõuab lõppu + 1 ruut, siis näita lõpusõnumit
+                if (mangija.getTranslateX() > (manguLaius + 5) * 50){           //kui mängija jõuab lõppu + 1 ruut, siis näita lõpusõnumit
                     primaryStage.setScene(kolmas);
-                }
+                    }
             }
 
         };timer.start();
@@ -180,7 +169,7 @@ public class Katse2 extends Application {
                 } else if (event.getCode() == KeyCode.UP && mangija.getTranslateY() >= 5 && !jumping){
                     grav = -3;
                     jumping = true;
-                }
+                    }
             });
 
             uuesti.setOnAction(event -> {       //Death screen nupp -> reset game
@@ -190,9 +179,7 @@ public class Katse2 extends Application {
                 primaryStage.setScene(esimene);
             });
 
-            round.setOnAction(event -> {
-                System.out.println("ROUND");
-                nextLevel = 2;
+            uuesti2.setOnAction(event -> {       //Death screen nupp -> reset game
                 mangija.setTranslateX(100);
                 mangija.setTranslateY(100);
                 gameRoot.setLayoutX(0);
