@@ -2,7 +2,6 @@ package TakistusjooksFX;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -62,7 +61,7 @@ public class Katse2 extends Application {
         appRoot.getChildren().addAll(taust, gameRoot);     //Pane kogu krempel kõige peamisele Pane'ile ehk sellele, kus toimub liikumine (appRoot)
     }
 
-    Rectangle mangija = tekitaRuut(100, 100, 30, 30, Color.WHITE);    //Tekita mängija ruut
+    Rectangle mangija = tekitaRuut(100, 200, 30, 30, Color.WHITE);    //Tekita mängija ruut
 
     private void taustLiigub() {               //Meetod, mis paneb tausta vasakult paremale liikuma (liigub gameRoot)
         double scrollSpeed = -3;              //Liikumise kiirus
@@ -133,11 +132,9 @@ public class Katse2 extends Application {
         Scene teine = new Scene(akenEnd, 600, 400);
 
         VBox congratsAken = new VBox();                 //Lõpusõnum
-        Button uuesti2 = new Button("Uuesti?");
-        uuesti2.setStyle("-fx-font-size: 21pt;");
         Text congratsT = new Text("See oli küll napikas!!!");
         congratsT.setStyle("-fx-font-size: 40pt;");
-        congratsAken.getChildren().addAll(congratsT, uuesti2);
+        congratsAken.getChildren().addAll(congratsT);
         congratsAken.setAlignment(Pos.CENTER);
         Scene kolmas = new Scene(congratsAken, 600, 400);
 
@@ -173,13 +170,6 @@ public class Katse2 extends Application {
             });
 
             uuesti.setOnAction(event -> {       //Death screen nupp -> reset game
-                mangija.setTranslateX(100);
-                mangija.setTranslateY(100);
-                gameRoot.setLayoutX(0);
-                primaryStage.setScene(esimene);
-            });
-
-            uuesti2.setOnAction(event -> {       //Death screen nupp -> reset game
                 mangija.setTranslateX(100);
                 mangija.setTranslateY(100);
                 gameRoot.setLayoutX(0);
