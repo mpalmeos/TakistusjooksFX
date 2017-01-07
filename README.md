@@ -1,6 +1,6 @@
-# TakistusjooksFX
+# Napikas: The Game
 
-TakistusjooksFX is a platformer made in JavaFX. The player is a white square that travels 
+Napikas: The Game is a platformer made in JavaFX. The player is a white square that travels 
 from left to right over bigger blue squares that form obstacles. The player can only jump.
 The game is over if the player gets stuck behind an obstacle, falls from a platform or
 reaches the end of the level.
